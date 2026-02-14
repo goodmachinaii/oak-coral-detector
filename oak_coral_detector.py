@@ -33,7 +33,8 @@ YOLO_NAMES = MODELS_DIR / 'cpu/coco.names'
 CORAL_MODEL = MODELS_DIR / 'ssdlite_mobiledet_coco_qat_postprocess_edgetpu.tflite'
 CORAL_LABELS = MODELS_DIR / 'coco_labels.txt'
 CORAL_DOCKER_URL = os.environ.get('CORAL_DOCKER_URL', 'http://127.0.0.1:8765')
-CORAL_HTTP_TIMEOUT = float(os.environ.get('CORAL_HTTP_TIMEOUT', '0.6'))
+CORAL_HTTP_TIMEOUT = float(os.environ.get('CORAL_HTTP_TIMEOUT', '2.0'))
+CORAL_MAX_TIMEOUTS = int(os.environ.get('CORAL_MAX_TIMEOUTS', '5'))
 
 RGB_PREVIEW_SIZE = tuple(map(int, os.environ.get('RGB_PREVIEW_SIZE', '640,360').split(',')))
 RGB_FPS = int(os.environ.get('RGB_FPS', '15'))
@@ -247,6 +248,7 @@ def run_once(detector, mode):
             start_t = time.monotonic()
             fps_counter = 0
             fps = 0.0
+            coral_timeout_streak = 0
 
             while True:
                 if STOP_FILE.exists() or clicked['stop']:
@@ -281,8 +283,18 @@ def run_once(detector, mode):
                 frame_idx += 1
                 if frame_idx % detect_every_n == 0:
                     t0 = time.monotonic()
-                    cached = detector.detect(frame)
-                    infer_ms = (time.monotonic() - t0) * 1000
+                    try:
+                        cached = detector.detect(frame)
+                        infer_ms = (time.monotonic() - t0) * 1000
+                        coral_timeout_streak = 0
+                    except Exception as e:
+                        if mode.startswith('coral') and 'timeout' in str(e).lower():
+                            coral_timeout_streak += 1
+                            log(f'Coral timeout {coral_timeout_streak}/{CORAL_MAX_TIMEOUTS}: {e}')
+                            if coral_timeout_streak >= CORAL_MAX_TIMEOUTS:
+                                raise RuntimeError(f'coral timeout consecutivo ({coral_timeout_streak})')
+                            continue
+                        raise
                 class_ids, scores, boxes, labels = cached
 
                 for cid, score, box in zip(class_ids, scores, boxes):

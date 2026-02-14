@@ -46,7 +46,8 @@ cd oak-coral-detector
 - `OAK_CORAL_MODELS_DIR`
 - `OAK_CORAL_VENV_ACTIVATE`
 - `CORAL_DOCKER_URL`
-- `CORAL_HTTP_TIMEOUT`
+- `CORAL_HTTP_TIMEOUT` (default 2.0s)
+- `CORAL_MAX_TIMEOUTS` (default 5, timeouts consecutivos antes de fallback)
 - `CONF_THRESHOLD`
 - `NMS_THRESHOLD`
 - `RGB_FPS`
