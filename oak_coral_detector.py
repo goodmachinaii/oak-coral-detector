@@ -15,12 +15,13 @@ from oak_vision.capture import build_pipeline
 from oak_vision.inference import make_detector, CPUDetector
 from oak_vision.depth import depth_text_for_box
 from oak_vision.display import gui_enabled, draw_buttons, draw_hud, show_frames, idle_sleep
+from oak_vision.storage import DetectionStorage
 
 cv2.setUseOptimized(True)
 cv2.setNumThreads(2)
 
 
-def run_once(settings, detector, mode):
+def run_once(settings, detector, mode, storage: DetectionStorage):
     clicked = {'stop': False, 'exit': False}
     btn_stop = [0, 0, 0, 0]
     btn_exit = [0, 0, 0, 0]
@@ -109,12 +110,27 @@ def run_once(settings, detector, mode):
                         raise
 
                 class_ids, scores, boxes, labels = cached
+                stored_rows = []
                 for cid, score, box in zip(class_ids, scores, boxes):
                     x, y, bw, bh = [int(v) for v in box]
                     label = labels.get(cid, str(cid)) if isinstance(labels, dict) else (labels[cid] if cid < len(labels) else str(cid))
                     z_text = depth_text_for_box(last_depth, frame.shape, box)
+                    depth_cm = None
+                    if 'Z:' in z_text:
+                        try:
+                            depth_cm = float(z_text.split('Z:')[1].replace('cm', '').strip())
+                        except Exception:
+                            depth_cm = None
+                    stored_rows.append({
+                        'label': label,
+                        'confidence': float(score),
+                        'bbox': (x, y, bw, bh),
+                        'depth_cm': depth_cm,
+                    })
                     cv2.rectangle(frame, (x, y), (x + bw, y + bh), (0, 255, 0), 2)
                     cv2.putText(frame, f'{label} {score*100:.0f}%{z_text}', (x, max(20, y - 8)), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (255, 255, 255), 2)
+
+                storage.store(stored_rows, mode=mode, infer_ms=infer_ms)
 
                 draw_buttons(frame, btn_stop, btn_exit)
                 draw_hud(frame, mode, infer_ms, fps, len(boxes))
@@ -133,23 +149,31 @@ def main():
     settings.stop_file.unlink(missing_ok=True)
 
     detector, mode = make_detector(settings)
+    storage = DetectionStorage(
+        db_path=settings.db_path,
+        retention_days=settings.db_retention_days,
+        prune_every_sec=settings.db_prune_every_sec,
+    )
     log(settings, f'Iniciando OAK Coral Detector (mode={mode})')
 
-    while True:
-        if settings.stop_file.exists():
-            break
-        try:
-            action = run_once(settings, detector, mode)
-            if action in ('stop', 'exit'):
-                break
-        except Exception as e:
-            log(settings, f'Reinicio de pipeline por excepción: {e}')
+    try:
+        while True:
             if settings.stop_file.exists():
                 break
-            if mode.startswith('coral'):
-                log(settings, 'Coral inestable: cambio automático a CPU fallback')
-                detector, mode = CPUDetector(settings), 'cpu'
-            time.sleep(1)
+            try:
+                action = run_once(settings, detector, mode, storage)
+                if action in ('stop', 'exit'):
+                    break
+            except Exception as e:
+                log(settings, f'Reinicio de pipeline por excepción: {e}')
+                if settings.stop_file.exists():
+                    break
+                if mode.startswith('coral'):
+                    log(settings, 'Coral inestable: cambio automático a CPU fallback')
+                    detector, mode = CPUDetector(settings), 'cpu'
+                time.sleep(1)
+    finally:
+        storage.close()
 
     log(settings, 'OAK Coral Detector detenido')
 

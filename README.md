@@ -21,7 +21,8 @@ El runtime muestra explícitamente el modo (`coral-docker`, `coral-local`, `cpu`
 ## Estructura
 
 - `oak_coral_detector.py` (orquestador principal)
-- `oak_vision/` (módulos fase 1: config, capture, inference, depth, display)
+- `oak_vision/` (módulos fase 1/2: config, capture, inference, depth, display, storage)
+- `data/oak.db` (SQLite runtime de detecciones)
 - `start_coral_stack.sh`
 - `stop_coral_stack.sh`
 - `download_cpu_models.sh` (descarga fallback CPU)
@@ -54,6 +55,9 @@ cd oak-coral-detector
 - `RGB_FPS`
 - `RGB_PREVIEW_SIZE` (ej: `640,360`)
 - `HEADLESS` (`auto` por defecto, o `1` para forzar sin GUI)
+- `OAK_DB_PATH` (default: `data/oak.db`)
+- `OAK_DB_RETENTION_DAYS` (default: `7`)
+- `OAK_DB_PRUNE_EVERY_SEC` (default: `300`)
 
 Ejemplo:
 

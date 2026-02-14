@@ -24,6 +24,9 @@ class Settings:
     conf_th: float
     nms_th: float
     headless: str
+    db_path: Path
+    db_retention_days: int
+    db_prune_every_sec: int
 
 
 def load_settings() -> Settings:
@@ -47,6 +50,9 @@ def load_settings() -> Settings:
         conf_th=float(os.environ.get('CONF_THRESHOLD', '0.35')),
         nms_th=float(os.environ.get('NMS_THRESHOLD', '0.40')),
         headless=os.environ.get('HEADLESS', 'auto').lower(),
+        db_path=Path(os.environ.get('OAK_DB_PATH', base_dir / 'data/oak.db')),
+        db_retention_days=int(os.environ.get('OAK_DB_RETENTION_DAYS', '7')),
+        db_prune_every_sec=int(os.environ.get('OAK_DB_PRUNE_EVERY_SEC', '300')),
     )
 
 

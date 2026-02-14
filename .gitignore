@@ -5,3 +5,6 @@ __pycache__/
 *.tmp
 *.swp
 STOP_*.flag
+data/*.db
+data/*.db-wal
+data/*.db-shm
