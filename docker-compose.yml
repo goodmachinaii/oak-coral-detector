@@ -1,0 +1,11 @@
+services:
+  coral-infer:
+    build: ./docker
+    container_name: coral-infer
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8765:8765"
+    devices:
+      - "/dev/bus/usb:/dev/bus/usb"
+    environment:
+      - PYTHONUNBUFFERED=1
