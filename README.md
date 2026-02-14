@@ -24,6 +24,7 @@ El runtime muestra explícitamente el modo (`coral-docker`, `coral-local`, `cpu`
 - `oak_vision/` (módulos fase 1/2/3: config, capture, inference, depth, display, storage, api)
 - `front/index.html` (dashboard local)
 - `data/oak.db` (SQLite runtime de detecciones)
+- `openclaw/SKILL.md` + `openclaw/queries.md` (consultas para asistente)
 - `start_coral_stack.sh`
 - `stop_coral_stack.sh`
 - `download_cpu_models.sh` (descarga fallback CPU)
