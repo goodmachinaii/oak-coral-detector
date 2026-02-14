@@ -10,8 +10,8 @@ from pycoral.utils.edgetpu import make_interpreter
 
 app = Flask(__name__)
 
-MODEL_PATH = '/app/models/ssdlite_mobiledet_coco_qat_postprocess_edgetpu.tflite'
-LABELS_PATH = '/app/models/coco_labels.txt'
+MODEL_PATH = os.environ.get('CORAL_MODEL_PATH', '/app/models/ssdlite_mobiledet_coco_qat_postprocess_edgetpu.tflite')
+LABELS_PATH = os.environ.get('CORAL_LABELS_PATH', '/app/models/coco_labels.txt')
 
 labels = {}
 interpreter = None
@@ -44,7 +44,6 @@ def init_engine():
 
 @app.route('/health', methods=['GET'])
 def health():
-    # No bloquear salud por init pesado
     ready = interpreter is not None
     return jsonify({
         'ok': True,
@@ -64,7 +63,11 @@ def infer():
     if not data:
         return jsonify({'error': 'empty body'}), 400
 
-    img = Image.open(io.BytesIO(data)).convert('RGB').resize((in_w, in_h))
+    try:
+        img = Image.open(io.BytesIO(data)).convert('RGB').resize((in_w, in_h))
+    except Exception as e:
+        return jsonify({'error': f'invalid image: {e}'}), 400
+
     common.set_input(interpreter, img)
     interpreter.invoke()
 

@@ -1,10 +1,16 @@
 services:
   coral-infer:
-    build: ./docker
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
     restart: unless-stopped
     ports:
       - "127.0.0.1:8765:8765"
     devices:
       - "/dev/bus/usb:/dev/bus/usb"
+    volumes:
+      - ./models:/app/models:ro
     environment:
       - PYTHONUNBUFFERED=1
+      - CORAL_MODEL_PATH=/app/models/ssdlite_mobiledet_coco_qat_postprocess_edgetpu.tflite
+      - CORAL_LABELS_PATH=/app/models/coco_labels.txt

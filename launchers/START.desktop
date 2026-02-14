@@ -1,7 +1,7 @@
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=START YOLO PI LUXONIS CORAL
-Exec=/bin/bash -lc 'cd "/home/machina/Desktop/computer vision/computer-vision-yolo-pi-luxonis-coral" && ./start_coral_stack.sh'
+Name=START OAK Coral Detector
+Exec=/bin/bash -lc 'cd "$HOME/Desktop/computer vision/computer-vision-yolo-pi-luxonis-coral" && ./start_coral_stack.sh'
 Icon=camera-video
 Terminal=true

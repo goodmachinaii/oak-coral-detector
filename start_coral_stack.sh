@@ -19,6 +19,10 @@ for i in {1..20}; do
 done
 
 # Limpia flag y arranca app host
-rm -f STOP_YOLO_PI_LUXONIS_CORAL.flag
-source /home/machina/.openclaw/workspace/.venv-luxonis/bin/activate
-exec python YOLO_PI_LUXONIS_CORAL.py
+rm -f STOP_OAK_CORAL_DETECTOR.flag
+VENV_ACTIVATE="${OAK_CORAL_VENV_ACTIVATE:-$PWD/.venv/bin/activate}"
+if [[ -f "$VENV_ACTIVATE" ]]; then
+  # shellcheck disable=SC1090
+  source "$VENV_ACTIVATE"
+fi
+exec python oak_coral_detector.py

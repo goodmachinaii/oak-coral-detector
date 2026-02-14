@@ -17,8 +17,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-COPY app.py /app/app.py
-COPY models /app/models
+COPY docker/app.py /app/app.py
 
 EXPOSE 8765
 CMD ["python3", "/app/app.py"]
