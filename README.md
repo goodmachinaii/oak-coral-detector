@@ -202,8 +202,15 @@ Plan detallado Iteración 2 (v3): `docs/iteracion-2-plan-v3.md`
 - [x] Tracking/deduplicación con EventTracker (Norfair) + tabla `events`
 - [x] Endpoints por evento (`/events`, `/events/<id>`, `/stats`, `/health`, `/latest`)
 - [x] Hardening base con backoff exponencial y `system_events`
-- [ ] Paridad fina y QA completo (unit + integración)
+- [x] QA base (smoke tests + script de integración)
 - [ ] Ajustes de dashboard y release final para merge a `main`
+
+QA rápida:
+
+```bash
+python3 -m unittest discover -s tests -p 'test_*_smoke.py'
+./scripts/test_integration_iter2.sh
+```
 
 ## Notas
 
