@@ -1,31 +1,30 @@
 # SKILL.md — Oak Vision Queries
 
-Usa este skill cuando el usuario pregunte por **qué detectó la cámara**, estadísticas, historial o distancia de objetos.
+Usa este skill cuando el usuario pregunte por detecciones de cámara, actividad o distancias.
 
-## Fuentes de datos
+## Regla fundamental
 
-1. **Preferido:** API local
-- Base URL: `http://127.0.0.1:5000`
-- Endpoints:
-  - `GET /status`
-  - `GET /detections`
-  - `GET /detections/stats?hours=24`
+**SIEMPRE usar `events` para reportes al usuario.**
+- `detections` cuenta frames (debug)
+- `events` cuenta objetos reales (reportes)
 
-2. **Fallback:** SQLite local
-- DB: `data/oak.db`
-- Tabla principal: `detections`
+## Fuentes
+
+1. API local (preferida): `http://127.0.0.1:5000`
+   - `GET /status`
+   - `GET /latest`
+   - `GET /events`
+   - `GET /events/<id>`
+   - `GET /stats`
+   - `GET /health`
+
+2. SQLite fallback: `data/oak.db`
+   - Tabla de reportes: `events`
+   - Tabla raw/debug: `detections`
 
 ## Reglas
 
 - Consultar solo cuando el usuario lo pida.
-- Responder en lenguaje natural, breve y con unidades claras (cm/m).
+- Responder breve y en lenguaje natural.
+- Timestamps están en UTC; al responder, convertir/explicar hora local si aplica.
 - Si no hay datos recientes, decirlo explícitamente.
-- Si API no responde, usar queries SQLite del catálogo `queries.md`.
-- **Zona horaria:** los timestamps en DB/API están en **UTC**; al responder al usuario, convertir/explicar en hora local cuando aplique.
-
-## Ejemplos de intención
-
-- "¿Qué ves ahora?"
-- "¿Qué detectaste en la última hora?"
-- "¿Cuál fue el objeto más cercano?"
-- "¿A qué hora hubo más movimiento?"

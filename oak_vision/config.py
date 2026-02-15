@@ -29,6 +29,12 @@ class Settings:
     db_prune_every_sec: int
     api_host: str
     api_port: int
+    min_score: float
+    score_threshold: float
+    tracker_distance_threshold: float
+    tracker_initialization_delay: int
+    tracker_hit_counter_max: int
+    oak_frame_timeout: float
 
 
 def load_settings() -> Settings:
@@ -57,6 +63,12 @@ def load_settings() -> Settings:
         db_prune_every_sec=int(os.environ.get('OAK_DB_PRUNE_EVERY_SEC', '300')),
         api_host=os.environ.get('OAK_API_HOST', '0.0.0.0'),
         api_port=int(os.environ.get('OAK_API_PORT', '5000')),
+        min_score=float(os.environ.get('MIN_SCORE', '0.50')),
+        score_threshold=float(os.environ.get('SCORE_THRESHOLD', '0.70')),
+        tracker_distance_threshold=float(os.environ.get('TRACKER_DISTANCE_THRESHOLD', '0.7')),
+        tracker_initialization_delay=int(os.environ.get('TRACKER_INITIALIZATION_DELAY', '3')),
+        tracker_hit_counter_max=int(os.environ.get('TRACKER_HIT_COUNTER_MAX', '15')),
+        oak_frame_timeout=float(os.environ.get('OAK_FRAME_TIMEOUT', '6.0')),
     )
 
 

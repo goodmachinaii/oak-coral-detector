@@ -1,4 +1,5 @@
 depthai
 opencv-python
-numpy
+numpy>=1.21
 flask
+norfair>=2.2.0

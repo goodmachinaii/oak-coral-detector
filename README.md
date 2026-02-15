@@ -186,6 +186,8 @@ DESPUÉS: orquestador + módulos oak_vision/ + SQLite + API + Front + OpenClaw d
 
 ## Roadmap
 
+Plan detallado Iteración 2 (v3): `docs/iteracion-2-plan-v3.md`
+
 ### Iteración 1 (actual, estable) ✅
 
 - [x] Renombre y limpieza de naming a OAK Coral Detector
@@ -195,13 +197,13 @@ DESPUÉS: orquestador + módulos oak_vision/ + SQLite + API + Front + OpenClaw d
 - [x] OpenClaw skill + queries fase 4
 - [x] Hardening base: headless auto, fallback CPU, timeout streak
 
-### Iteración 2 (siguiente)
+### Iteración 2 (en implementación)
 
-- [ ] Paridad completa de endpoints entre backend Flask y fallback stdlib
-- [ ] Tracking/deduplicación para métricas por evento (no solo por frame)
-- [ ] Endpoints de historial y estadísticas avanzadas (closest, busiest hour)
-- [ ] Mejor manejo de crash OAK/USB (backoff + autorecovery)
-- [ ] Pruebas de regresión y checklist de release para merge a `main`
+- [x] Tracking/deduplicación con EventTracker (Norfair) + tabla `events`
+- [x] Endpoints por evento (`/events`, `/events/<id>`, `/stats`, `/health`, `/latest`)
+- [x] Hardening base con backoff exponencial y `system_events`
+- [ ] Paridad fina y QA completo (unit + integración)
+- [ ] Ajustes de dashboard y release final para merge a `main`
 
 ## Notas
 
