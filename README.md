@@ -81,6 +81,64 @@ sudo docker compose ps
 curl -s http://127.0.0.1:8765/health
 ```
 
+## Arquitectura (diagramas)
+
+### Flujo principal por frame
+
+```text
+oak_coral_detector.py (orquestador)
+
+  config.load()
+      |
+  capture.grab() ---> rgb + depth
+      |
+  inference.run(rgb) ---> detections + mode + infer_ms
+      |
+  depth.enrich(detections, depth) ---> depth_cm por objeto
+      |
+  storage.store(...) ---> SQLite (data/oak.db)
+      |
+  display.render(...) ---> ventana (o headless)
+      |
+  api/status + dashboard (/)
+```
+
+### Componentes en la Raspberry Pi
+
+```text
++---------------------------- Raspberry Pi -----------------------------+
+|                                                                       |
+|  oak_coral_detector.py                                                |
+|      |                                                                |
+|      +--> oak_vision.capture    --> Luxonis OAK (RGB + Depth)        |
+|      +--> oak_vision.inference  --> coral-infer docker (:8765)       |
+|      +--> oak_vision.depth      --> depth_cm (mediana ROI)           |
+|      +--> oak_vision.storage    --> SQLite data/oak.db               |
+|      +--> oak_vision.display    --> OpenCV GUI / headless            |
+|      +--> oak_vision.api        --> HTTP local (:5000) + front       |
+|                                                                       |
++-----------------------------------------------------------------------+
+```
+
+## Roadmap
+
+### Iteración 1 (actual, estable) ✅
+
+- [x] Renombre y limpieza de naming a OAK Coral Detector
+- [x] Modularización fase 1 (`oak_vision/*`)
+- [x] Storage SQLite fase 2 (`data/oak.db`)
+- [x] API local + front fase 3
+- [x] OpenClaw skill + queries fase 4
+- [x] Hardening base: headless auto, fallback CPU, timeout streak
+
+### Iteración 2 (siguiente)
+
+- [ ] Paridad completa de endpoints entre backend Flask y fallback stdlib
+- [ ] Tracking/deduplicación para métricas por evento (no solo por frame)
+- [ ] Endpoints de historial y estadísticas avanzadas (closest, busiest hour)
+- [ ] Mejor manejo de crash OAK/USB (backoff + autorecovery)
+- [ ] Pruebas de regresión y checklist de release para merge a `main`
+
 ## Notas
 
 - La profundidad Z se estima con **mediana de ROI central** (más estable que 1 píxel).
