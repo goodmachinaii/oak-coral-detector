@@ -2,6 +2,10 @@
 
 Detección de objetos en tiempo real + profundidad (Z) con **Luxonis OAK** y aceleración en **Coral EdgeTPU**.
 
+## Lenguajes del repositorio
+
+![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=goodmachinaii&repo=oak-coral-detector&layout=compact&langs_count=8)
+
 ## Modelo real del sistema
 
 - **Principal (Coral):** SSDLite MobileDet EdgeTPU
