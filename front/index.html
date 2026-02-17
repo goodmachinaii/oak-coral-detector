@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OAK Coral Detector Dashboard</title>
+  <style>
+    body{font-family:system-ui,Arial;background:#111;color:#eee;margin:20px}
+    .card{background:#1c1c1c;border:1px solid #333;border-radius:10px;padding:14px;margin-bottom:12px}
+    h1{font-size:20px} table{width:100%;border-collapse:collapse} td,th{padding:6px;border-bottom:1px solid #333}
+  </style>
+</head>
+<body>
+  <h1>OAK Coral Detector Dashboard</h1>
+  <div class="card" id="status">cargando status...</div>
+  <div class="card">
+    <h3>Detecciones recientes</h3>
+    <table><thead><tr><th>timestamp</th><th>label</th><th>conf</th><th>depth_cm</th><th>mode</th></tr></thead><tbody id="rows"></tbody></table>
+  </div>
+  <div class="card" id="stats"></div>
+
+<script>
+async function refresh(){
+  const st = await fetch('/status').then(r=>r.json()).catch(()=>({}));
+  document.getElementById('status').textContent = `mode=${st.mode||'n/a'} | fps=${st.fps||0} | infer_ms=${st.infer_ms||0}`;
+
+  const det = await fetch('/detections').then(r=>r.json()).catch(()=>({objects:[]}));
+  const rows = (det.objects||[]).slice(0,20).map(o=>`<tr><td>${o.timestamp||''}</td><td>${o.label||''}</td><td>${((o.confidence||0)*100).toFixed(1)}%</td><td>${o.depth_cm??''}</td><td>${o.mode||''}</td></tr>`).join('');
+  document.getElementById('rows').innerHTML = rows || '<tr><td colspan="5">sin datos</td></tr>';
+
+  const stats = await fetch('/detections/stats?hours=24').then(r=>r.json()).catch(()=>({counts:[]}));
+  const txt = (stats.counts||[]).map(x=>`${x.label}: ${x.n}`).join(' · ');
+  document.getElementById('stats').textContent = `Stats 24h: ${txt || 'sin datos'}`;
+}
+refresh(); setInterval(refresh, 2000);
+</script>
+</body>
+</html>

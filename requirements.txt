@@ -1,0 +1,5 @@
+depthai<3.0.0
+opencv-python
+numpy>=1.21
+flask
+norfair>=2.2.0
